@@ -7,7 +7,7 @@ before_script:
 
 deploy:
   provider: releases
-  file: loader
+  file: launcher
   on:
     repo: dickeyxxx/launcher
     tags: true
