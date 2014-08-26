@@ -1,3 +1,14 @@
 language: go
 go:
   - 1.3
+
+before_script:
+  - go build
+
+deploy:
+  provider: releases
+  file: loader
+  on:
+    repo: dickeyxxx/launcher
+  api_key:
+    secure: sMexrlZBYtLsEXFxt3rV+QZMEUp4+6uPLH7yeW3u9MdS26F74oSmaONp2n5ZzoGf32LVFOdUB0d+gIdD8JDEmGskQgxeJxPwu355fKHNB3m/6Swgtma83OIUxJKE0X47eUJDwfctC0e1EXM/WN+rumSwpVhTCO4mDcS9ZRui7as=
