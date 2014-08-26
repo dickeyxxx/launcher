@@ -2,8 +2,11 @@ language: go
 go:
   - 1.3
 
+before_install:
+  - go get github.com/mitchellh/gox
+
 before_script:
-  - go build
+  - gox
 
 deploy:
   provider: releases
