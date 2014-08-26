@@ -31,13 +31,13 @@ namespace :deploy do
     TARGETS.each do |target|
       filename = "heroku_launcher_#{target[:os]}_#{target[:arch]}.gz"
       puts "Uploading #{filename}"
-      upload_file(bucket, "dist/#{VERSION}/#{filename}", "releases/#{VERSION}/#{filename}")
-      upload_file(bucket, "dist/#{VERSION}/#{filename}.sha1", "releases/#{VERSION}/#{filename}.sha1")
-      upload_file(bucket, "dist/#{VERSION}/#{filename}", "releases/#{filename}")
-      upload_file(bucket, "dist/#{VERSION}/#{filename}.sha1", "releases/#{filename}.sha1")
+      upload_file(bucket, "dist/#{VERSION}/#{filename}", "launcher/#{VERSION}/#{filename}")
+      upload_file(bucket, "dist/#{VERSION}/#{filename}.sha1", "launcher/#{VERSION}/#{filename}.sha1")
+      upload_file(bucket, "dist/#{VERSION}/#{filename}", "launcher/#{filename}")
+      upload_file(bucket, "dist/#{VERSION}/#{filename}.sha1", "launcher/#{filename}.sha1")
     end
     puts "setting VERSION to #{VERSION}"
-    upload_file(bucket, 'VERSION', 'releases/VERSION')
+    upload_file(bucket, 'VERSION', 'launcher/VERSION')
   end
 
   task :dev => :build do
@@ -47,10 +47,10 @@ namespace :deploy do
     TARGETS.each do |target|
       filename = "heroku_launcher_#{target[:os]}_#{target[:arch]}.gz"
       puts "Uploading #{filename}"
-      upload_file(bucket, "dist/#{VERSION}/#{filename}", "releases/dev/#{filename}")
-      upload_file(bucket, "dist/#{VERSION}/#{filename}.sha1", "releases/dev/#{filename}.sha1")
+      upload_file(bucket, "dist/#{VERSION}/#{filename}", "launcher/dev/#{filename}")
+      upload_file(bucket, "dist/#{VERSION}/#{filename}.sha1", "launcher/dev/#{filename}.sha1")
     end
-    upload_string(bucket, COMMIT, 'releases/dev/COMMIT')
+    upload_string(bucket, COMMIT, 'launcher/dev/COMMIT')
   end
 end
 
