@@ -5,6 +5,7 @@ install:
   - go get -v -t ./....
   - go build -v ./...
 after_success:
+  - gem install aws-sdk
   - rake deploy
 env:
   global:
