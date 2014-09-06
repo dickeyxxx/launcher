@@ -5,3 +5,6 @@ go:
 install:
   - go get -v -t ./....
   - go build -v ./...
+
+after_success:
+  - rake deploy
