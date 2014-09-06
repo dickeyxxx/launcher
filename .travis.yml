@@ -4,10 +4,3 @@ go:
 install:
   - go get -v -t ./....
   - go build -v ./...
-after_success:
-  - gem install aws-sdk
-  - rake deploy
-env:
-  global:
-    - secure: EL/78IoIEka0fn7M6Ps7dvcF5Dc6znM+w5WrJKI7TWFDFuBGjkMPuk6yJx/FkwdG/r7IJCFIryvOinRtGXKCwNHbhXFZ4X72yOcHSIj9iJDLW6m/1ACKwxgDqA24VwhaJEXkbDM9sHZcvQEEeJwHTt3Ae0HEZQ5NJBcxImaLbyE=
-    - secure: SzGW1jHlH9Vhz1jcgToVVTDX/lc1Vn10mpRbKfC805bMBAB0xCLvJZrs0xdaMH2M3BJX3dZRSmfeWKzqKloJlinWeAxQazWRHo+qUJUz3TRTLWK3MDcY1muU2xzXjUwbH1N6jWP/UCD132jPRMaUmXkd4FJHYmMEc7KlA4I9GUc=
