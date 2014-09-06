@@ -11,6 +11,11 @@ TARGETS = [
 VERSION = File.open('VERSION').read.chomp
 COMMIT = `git rev-parse HEAD`
 
+task :run do
+  build(nil, nil, './launcher')
+  exec('./launcher', *ARGV[1..-1])
+end
+
 task :build do
   FileUtils.mkdir_p 'dist'
   puts "Building #{VERSION}"
