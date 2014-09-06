@@ -11,11 +11,7 @@ TARGETS = [
   {os: 'windows', arch: '386'}
 ]
 
-VERSION = `cat VERSION`.chomp
-dirty = `git status 2> /dev/null | tail -n1`.chomp != 'nothing to commit, working directory clean'
-BRANCH = dirty ? 'dirty' : `git rev-parse --abbrev-ref HEAD`.chomp
-
-puts "launcher VERSION: #{VERSION}"
+DIRTY = `git status 2> /dev/null | tail -n1`.chomp != 'nothing to commit, working directory clean'
 
 task :run do
   build(nil, nil, './launcher')
@@ -41,37 +37,22 @@ task :gzip => :build do
 end
 
 task :deploy => :gzip do
-  case BRANCH
-  when 'dev'
-    deploy('dev')
-  when 'release'
-    deploy('release')
-  else
-    puts 'not on deployable branch (dev/release) current branch is: ' + BRANCH
-  end
-end
-
-def deploy(channel)
-  puts "deploying #{VERSION} to #{channel}..."
+  raise 'dirty' if DIRTY
+  puts "deploying..."
   bucket = get_s3_bucket
   TARGETS.each do |target|
     filename = "launcher_#{target[:os]}_#{target[:arch]}.gz"
     local_path = "./dist/#{filename}"
-    remote_path = "launcher/#{channel}/#{VERSION}/#{filename}"
+    remote_path = "launcher/#{filename}"
     remote_url = "#{BUCKET_NAME}.s3.amazonaws.com/#{remote_path}"
     puts "uploading #{local_path} to #{remote_url}"
     upload_file(bucket, local_path, remote_path)
     upload_file(bucket, local_path + ".sha1", remote_path + ".sha1")
   end
-  version_path = "launcher/#{channel}/VERSION"
-  puts "setting #{version_path} to #{VERSION}"
-  upload_string(bucket, VERSION, version_path)
 end
 
 def build(os, arch, path)
-  ldflags = "-X main.VERSION #{VERSION}"
-  args = "-o #{path} -ldflags \"#{ldflags}\""
-  system("GOOS=#{os} GOARCH=#{arch} go build #{args}")
+  system("GOOS=#{os} GOARCH=#{arch} go build -o #{path}")
 end
 
 def write_digest(path)
@@ -87,11 +68,5 @@ end
 def upload_file(bucket, local, remote)
   obj = bucket.objects[remote]
   obj.write(Pathname.new(local))
-  obj.acl = :public_read
-end
-
-def upload_string(bucket, s, remote)
-  obj = bucket.objects[remote]
-  obj.write(s)
   obj.acl = :public_read
 end
