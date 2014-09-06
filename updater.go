@@ -40,7 +40,6 @@ type Updater struct {
 func NewUpdater() (*Updater, error) {
 	logger, err := NewLogFile(updateLogPath())
 	if err != nil {
-		logger.Println(err)
 		return nil, err
 	}
 	return &Updater{logger}, nil
