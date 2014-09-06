@@ -13,14 +13,10 @@ import (
 
 func homeDir() string {
 	user, err := user.Current()
-	must(err)
-	return user.HomeDir
-}
-
-func must(err error) {
 	if err != nil {
 		panic(err)
 	}
+	return user.HomeDir
 }
 
 func fileExists(path string) (bool, error) {

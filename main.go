@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"runtime"
@@ -10,12 +11,18 @@ import (
 func main() {
 	if isUpdateCheckNeeded() {
 		updater, err := NewUpdater()
-		must(err)
+		if err != nil {
+			fmt.Println("Error updating")
+		}
 		err = updater.updateIfNeeded()
-		must(err)
+		if err != nil {
+			fmt.Println("Error updating")
+		}
 	}
 	err := run(os.Args)
-	must(err)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func run(args []string) error {
