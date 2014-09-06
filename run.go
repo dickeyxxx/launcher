@@ -7,16 +7,16 @@ import (
 	"syscall"
 )
 
-func run(path string, args []string) error {
+func run(args []string) error {
 	if runtime.GOOS == "windows" {
-		return runWindows(path, args)
+		return runWindows(args)
 	}
 	env := os.Environ()
-	return syscall.Exec(path, args, env)
+	return syscall.Exec(hkPath(), args, env)
 }
 
-func runWindows(path string, args []string) error {
-	cmd := exec.Command(path, args[1:]...)
+func runWindows(args []string) error {
+	cmd := exec.Command(hkPath(), args[1:]...)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr

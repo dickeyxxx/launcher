@@ -1,21 +1,14 @@
 package main
 
-import (
-	"os"
-	"path/filepath"
-	"runtime"
-)
+import "os"
 
 func main() {
-	hkPath := filepath.Join(homeDir(), ".hk", "hk")
-	if runtime.GOOS == "windows" {
-		hkPath = hkPath + ".exe"
+	if isUpdateCheckNeeded() {
+		updater, err := NewUpdater()
+		must(err)
+		err = updater.updateIfNeeded()
+		must(err)
 	}
-	exists, err := fileExists(hkPath)
-	must(err)
-	if !exists {
-		downloadHk(hkPath)
-	}
-	err = run(hkPath, os.Args)
+	err := run(os.Args)
 	must(err)
 }

@@ -1,9 +1,14 @@
 package main
 
 import (
+	"compress/gzip"
+	"io"
+	"io/ioutil"
+	"net/http"
 	"os"
 	"os/user"
 	"runtime"
+	"strings"
 )
 
 func homeDir() string {
@@ -33,4 +38,46 @@ func fileExists(path string) (bool, error) {
 		return false, err
 	}
 	return true, nil
+}
+
+func downloadGzip(url string, filepath string) error {
+	out, err := os.Create(filepath)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+	resp, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	uncompressed, err := gzip.NewReader(resp.Body)
+	if err != nil {
+		return err
+	}
+	_, err = io.Copy(out, uncompressed)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func makeExecutable(filepath string) error {
+	if runtime.GOOS == "windows" {
+		return nil
+	}
+	return os.Chmod(filepath, 0777)
+}
+
+func getUrlAsString(url string) (string, error) {
+	resp, err := http.Get(url)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+	version, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+	return strings.TrimSpace(string(version)), nil
 }
