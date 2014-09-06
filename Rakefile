@@ -12,9 +12,15 @@ TARGETS = [
 ]
 
 VERSION = `cat VERSION`.chomp
-BRANCH = `git rev-parse --abbrev-ref HEAD`.chomp
+dirty = `git status 2> /dev/null | tail -n1`.chomp != 'nothing to commit, working directory clean'
+BRANCH = dirty ? 'dirty' : `git rev-parse --abbrev-ref HEAD`.chomp
 
 puts "launcher VERSION: #{VERSION}"
+
+task :run do
+  build(nil, nil, './launcher')
+  exec './launcher', *ARGV[1..-1]
+end
 
 task :build do
   FileUtils.mkdir_p 'dist'
@@ -36,10 +42,12 @@ end
 
 task :deploy => :gzip do
   case BRANCH
-  when 'master'
+  when 'dev'
     deploy('dev')
   when 'release'
     deploy('release')
+  else
+    puts 'not on deployable branch (dev/release) current branch is: ' + BRANCH
   end
 end
 
