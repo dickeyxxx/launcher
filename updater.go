@@ -46,15 +46,19 @@ func NewUpdater() (*Updater, error) {
 }
 
 func (u *Updater) updateIfNeeded() error {
-	channel := "release"
-	updateNeeded, latest, err := u.checkForUpdate()
+	channel, err := getChannel()
 	if err != nil {
-		u.logger.Println(err)
+		u.logger.Println("Error reading channel file:", err)
+		return err
+	}
+	updateNeeded, latest, err := u.checkForUpdate(channel)
+	if err != nil {
+		u.logger.Println("Error checking for update:", err)
 		return err
 	}
 	if updateNeeded {
 		if err = u.update(channel, latest); err != nil {
-			u.logger.Println(err)
+			u.logger.Println("Error updating:", err)
 			return err
 		}
 		u.logger.Println("Updated to", latest, "on", channel)
@@ -62,9 +66,9 @@ func (u *Updater) updateIfNeeded() error {
 	return nil
 }
 
-func (u *Updater) checkForUpdate() (bool, string, error) {
+func (u *Updater) checkForUpdate(channel string) (bool, string, error) {
 	u.logger.Println("Checking latest version...")
-	latest, err := getUrlAsString("https://dickeyxxx_dev.s3.amazonaws.com/hk/release/VERSION")
+	latest, err := getUrlAsString("https://dickeyxxx_dev.s3.amazonaws.com/hk/" + channel + "/VERSION")
 	if err != nil {
 		return false, "", err
 	}
@@ -100,4 +104,15 @@ func (u *Updater) update(channel, version string) error {
 		return err
 	}
 	return nil
+}
+
+func getChannel() (string, error) {
+	exists, err := fileExists(filepath.Join(homeDir(), ".hk", "dev"))
+	if err != nil {
+		return "", err
+	}
+	if exists {
+		return "dev", nil
+	}
+	return "release", nil
 }
