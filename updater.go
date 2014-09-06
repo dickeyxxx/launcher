@@ -34,11 +34,11 @@ func isUpdateCheckNeeded() bool {
 }
 
 type Updater struct {
-	logger *LogFile
+	logger *FileLogger
 }
 
 func NewUpdater() (*Updater, error) {
-	logger, err := NewLogFile(updateLogPath())
+	logger, err := NewFileLogger(updateLogPath())
 	if err != nil {
 		return nil, err
 	}

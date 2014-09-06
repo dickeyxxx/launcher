@@ -6,13 +6,13 @@ import (
 	"path/filepath"
 )
 
-type LogFile struct {
+type FileLogger struct {
 	*log.Logger
 	*os.File
 }
 
-func NewLogFile(path string) (*LogFile, error) {
-	logFile := &LogFile{}
+func NewFileLogger(path string) (*FileLogger, error) {
+	logFile := &FileLogger{}
 	err := os.MkdirAll(filepath.Dir(hkPath()), 0777)
 	if err != nil {
 		return nil, err
