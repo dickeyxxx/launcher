@@ -46,43 +46,40 @@ func NewUpdater() (*Updater, error) {
 }
 
 func (u *Updater) updateIfNeeded() error {
+	u.logger.Println("Checking for update...")
 	channel, err := getChannel()
 	if err != nil {
 		u.logger.Println("Error reading channel file:", err)
 		return err
 	}
-	updateNeeded, latest, err := u.checkForUpdate(channel)
+	latest, err := u.getLatestVersion(channel)
 	if err != nil {
-		u.logger.Println("Error checking for update:", err)
-		return err
+		u.logger.Println("Error getting latest version:", err)
 	}
-	if updateNeeded {
+	current, err := u.getCurrentVersion()
+	if err != nil {
+		u.logger.Println("Error getting current version:", err)
+	}
+	if latest != current {
 		if err = u.update(channel, latest); err != nil {
 			u.logger.Println("Error updating:", err)
 			return err
 		}
-		u.logger.Println("Updated to", latest, "on", channel)
 	}
 	return nil
 }
 
-func (u *Updater) checkForUpdate(channel string) (bool, string, error) {
-	u.logger.Println("Checking latest version...")
+func (u *Updater) getLatestVersion(channel string) (string, error) {
+	u.logger.Println("Getting latest version...")
 	latest, err := getUrlAsString("https://dickeyxxx_dev.s3.amazonaws.com/hk/" + channel + "/VERSION")
 	if err != nil {
-		return false, "", err
+		return "", err
 	}
 	u.logger.Println("Latest version:", latest)
-	current, err := getCurrentVersion()
-	if err != nil {
-		u.logger.Println("Error getting latest version:", err)
-	} else {
-		u.logger.Println("Current version:", current)
-	}
-	return latest != current, latest, nil
+	return latest, nil
 }
 
-func getCurrentVersion() (string, error) {
+func (u *Updater) getCurrentVersion() (string, error) {
 	var stdout bytes.Buffer
 	cmd := exec.Command(hkPath(), "version")
 	cmd.Stdout = &stdout
@@ -91,6 +88,7 @@ func getCurrentVersion() (string, error) {
 	}
 	r := regexp.MustCompile(`hk/([\d\.]+-\w+).*`)
 	version := r.FindStringSubmatch(stdout.String())[1]
+	u.logger.Println("Current version:", version)
 	return string(version), nil
 }
 
@@ -103,6 +101,7 @@ func (u *Updater) update(channel, version string) error {
 	if err := makeExecutable(hkPath()); err != nil {
 		return err
 	}
+	u.logger.Println("Updated to", version, "on", channel)
 	return nil
 }
 
