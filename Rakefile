@@ -38,7 +38,6 @@ task :deploy => :build do
     remote_url = "#{BUCKET_NAME}.s3.amazonaws.com/#{remote_path}"
     puts "uploading #{local_path} to #{remote_url}"
     upload_file(bucket, local_path, remote_path)
-    upload_file(bucket, local_path + ".sha1", remote_path + ".sha1")
   end
 end
 
