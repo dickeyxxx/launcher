@@ -27,21 +27,12 @@ task :build do
   end
 end
 
-task :gzip => :build do
-  TARGETS.each do |target|
-    path = "./dist/launcher_#{target[:os]}_#{target[:arch]}"
-    puts "gzipping #{path}..."
-    system("gzip --keep -f #{path}")
-    write_digest("#{path}.gz")
-  end
-end
-
-task :deploy => :gzip do
+task :deploy => :build do
   raise 'dirty' if DIRTY
   puts "deploying..."
   bucket = get_s3_bucket
   TARGETS.each do |target|
-    filename = "launcher_#{target[:os]}_#{target[:arch]}.gz"
+    filename = "launcher_#{target[:os]}_#{target[:arch]}"
     local_path = "./dist/#{filename}"
     remote_path = "launcher/#{filename}"
     remote_url = "#{BUCKET_NAME}.s3.amazonaws.com/#{remote_path}"
